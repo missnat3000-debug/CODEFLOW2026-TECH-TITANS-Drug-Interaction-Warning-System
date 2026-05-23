@@ -1,19 +1,15 @@
-#include <stdio.h>
+
+   #include <stdio.h>
 #include <string.h>
-#include <ctype.h>
-
-#define MAX_MEDICINES 10
-#define MAX_NAME_LEN 50
-
+int language;
 typedef struct {
 
-    char drug1[MAX_NAME_LEN];
-    char drug2[MAX_NAME_LEN];
+    char drug1[50];
+    char drug2[50];
     char severity[20];
     char warning[200];
 
 } Interaction;
-
 Interaction interactionDB[] = {
 
     {
@@ -35,61 +31,161 @@ Interaction interactionDB[] = {
         "Aspirin",
         "HIGH",
         "Stomach bleeding risk."
+    },
+
+    {
+        "Cetirizine",
+        "Alcohol",
+        "MEDIUM",
+        "Drowsiness may increase."
     }
 };
 
-int totalInteractions = 3;
+int totalInteractions = 4;
+void selectLanguage() {
 
+    printf("====================================\n");
+    printf(" SELECT LANGUAGE\n");
+    printf("====================================\n");
 
-void toLowerCase(char str[]) {
+    printf("1. English\n");
+    printf("2. Hindi\n");
+    printf("3. Bengali\n");
+    printf("4. Tamil\n");
+    printf("5. Telugu\n");
 
-    for(int i = 0; str[i]; i++) {
+    printf("\nEnter choice: ");
+    scanf("%d", &language);
+}
+void displayWelcome() {
 
-        str[i] = tolower(str[i]);
+    if(language == 1) {
+
+        printf("\nDRUG INTERACTION WARNING SYSTEM\n");
+    }
+
+    else if(language == 2) {
+
+        printf("\nदवा इंटरैक्शन चेतावनी प्रणाली\n");
+    }
+
+    else if(language == 3) {
+
+        printf("\nওষুধ ইন্টারঅ্যাকশন সতর্কীকরণ সিস্টেম\n");
+    }
+
+    else if(language == 4) {
+
+        printf("\nமருந்து தொடர்பு எச்சரிக்கை அமைப்பு\n");
+    }
+
+    else if(language == 5) {
+
+        printf("\nఔషధ పరస్పర చర్య హెచ్చరిక వ్యవస్థ\n");
     }
 }
 
-int compareIgnoreCase(char a[], char b[]) {
+void displayInputMethod() {
 
-    char str1[MAX_NAME_LEN];
-    char str2[MAX_NAME_LEN];
+    if(language == 1) {
 
-    strcpy(str1, a);
-    strcpy(str2, b);
+        printf("\n1. Upload Image From Gallery\n");
+        printf("2. Manual Medicine Entry\n");
+    }
 
-    toLowerCase(str1);
-    toLowerCase(str2);
+    else if(language == 2) {
 
-    return strcmp(str1, str2);
+        printf("\n1. गैलरी से इमेज अपलोड करें\n");
+        printf("2. दवा का नाम दर्ज करें\n");
+    }
+
+    else if(language == 3) {
+
+        printf("\n1. গ্যালারি থেকে ছবি আপলোড করুন\n");
+        printf("2. ওষুধের নাম লিখুন\n");
+    }
+
+    else if(language == 4) {
+
+        printf("\n1. கேலரியில் இருந்து படத்தை பதிவேற்றுக\n");
+        printf("2. மருந்து பெயரை உள்ளிடுக\n");
+    }
+
+    else if(language == 5) {
+
+        printf("\n1. గ్యాలరీ నుండి చిత్రాన్ని అప్లోడ్ చేయండి\n");
+        printf("2. మందుల పేర్లు నమోదు చేయండి\n");
+    }
 }
 
+void displayDangerWarning() {
 
-void inputMedicines(char medicines[][MAX_NAME_LEN], int *count) {
+    if(language == 1) {
 
-    printf("\nEnter number of medicines (1-%d): ", MAX_MEDICINES);
+        printf("\nWARNING: Dangerous Drug Interaction Detected!\n");
+    }
+
+    else if(language == 2) {
+
+        printf("\nचेतावनी: खतरनाक दवा इंटरैक्शन मिला!\n");
+    }
+
+    else if(language == 3) {
+
+        printf("\nসতর্কতা: বিপজ্জনক ওষুধ প্রতিক্রিয়া সনাক্ত হয়েছে!\n");
+    }
+
+    else if(language == 4) {
+
+        printf("\nஎச்சரிக்கை: ஆபத்தான மருந்து தொடர்பு கண்டறியப்பட்டது!\n");
+    }
+
+    else if(language == 5) {
+
+        printf("\nహెచ్చరిక: ప్రమాదకర ఔషధ పరస్పర చర్య గుర్తించబడింది!\n");
+    }
+}
+
+void displaySafeMessage() {
+
+    if(language == 1) {
+
+        printf("\nNo dangerous interactions found.\n");
+    }
+
+    else if(language == 2) {
+
+        printf("\nकोई खतरनाक इंटरैक्शन नहीं मिला।\n");
+    }
+
+    else if(language == 3) {
+
+        printf("\nকোনও বিপজ্জনক প্রতিক্রিয়া পাওয়া যায়নি।\n");
+    }
+
+    else if(language == 4) {
+
+        printf("\nஆபத்தான தொடர்புகள் எதுவும் இல்லை.\n");
+    }
+
+    else if(language == 5) {
+
+        printf("\nప్రమాదకర పరస్పర చర్యలు కనబడలేదు.\n");
+    }
+}
+void inputMedicines(char medicines[][50], int *count) {
+
+    printf("\nEnter number of medicines: ");
     scanf("%d", count);
-
-    getchar(); // remove newline
-
-    if(*count <= 0 || *count > MAX_MEDICINES) {
-
-        printf("\nInvalid number of medicines.\n");
-        *count = 0;
-        return;
-    }
 
     for(int i = 0; i < *count; i++) {
 
         printf("Enter medicine %d: ", i + 1);
-
-        fgets(medicines[i], MAX_NAME_LEN, stdin);
-
-        medicines[i][strcspn(medicines[i], "\n")] = '\0';
+        scanf("%s", medicines[i]);
     }
 }
-
 void performOCR(char imagePath[],
-                char medicines[][MAX_NAME_LEN],
+                char medicines[][50],
                 int *count) {
 
     printf("\n[OCR] Processing Image: %s\n", imagePath);
@@ -98,8 +194,7 @@ void performOCR(char imagePath[],
 
     inputMedicines(medicines, count);
 }
-
-void checkInteractions(char medicines[][MAX_NAME_LEN], int count) {
+void checkInteractions(char medicines[][50], int count) {
 
     int found = 0;
 
@@ -112,43 +207,37 @@ void checkInteractions(char medicines[][MAX_NAME_LEN], int count) {
                 if(
 
                     (
-                        compareIgnoreCase(
-                            medicines[i],
-                            interactionDB[k].drug1
-                        ) == 0
+                        strcmp(medicines[i],
+                               interactionDB[k].drug1) == 0
 
                         &&
 
-                        compareIgnoreCase(
-                            medicines[j],
-                            interactionDB[k].drug2
-                        ) == 0
+                        strcmp(medicines[j],
+                               interactionDB[k].drug2) == 0
                     )
 
                     ||
 
                     (
-                        compareIgnoreCase(
-                            medicines[j],
-                            interactionDB[k].drug1
-                        ) == 0
+                        strcmp(medicines[j],
+                               interactionDB[k].drug1) == 0
 
                         &&
 
-                        compareIgnoreCase(
-                            medicines[i],
-                            interactionDB[k].drug2
-                        ) == 0
+                        strcmp(medicines[i],
+                               interactionDB[k].drug2) == 0
                     )
-                )
+                  )
 
                 {
 
                     found = 1;
 
                     printf("\n====================================");
-                    printf("\nINTERACTION DETECTED");
-                    printf("\n====================================");
+
+                    displayDangerWarning();
+
+                    printf("====================================");
 
                     printf("\nDrugs     : %s + %s",
                            medicines[i],
@@ -166,46 +255,43 @@ void checkInteractions(char medicines[][MAX_NAME_LEN], int count) {
 
     if(found == 0) {
 
-        printf("\nNo dangerous interactions found.\n");
+        displaySafeMessage();
     }
 }
-
 int main() {
 
-    char medicines[MAX_MEDICINES][MAX_NAME_LEN];
+    char medicines[10][50];
     int count = 0;
-
-    printf("====================================\n");
-    printf(" DRUG INTERACTION WARNING SYSTEM\n");
-    printf("====================================\n");
-
-    printf("\nSelect Input Method:\n");
-    printf("1. Upload Image From Gallery\n");
-    printf("2. Manual Medicine Entry\n");
-
     int choice;
+
+    selectLanguage();
+
+    printf("\n====================================\n");
+
+    displayWelcome();
+
+    printf("====================================\n");
+
+    displayInputMethod();
 
     printf("\nEnter choice: ");
     scanf("%d", &choice);
-
-    getchar(); 
 
     if(choice == 1) {
 
         printf("\n[INFO] Simulating Gallery Image Upload...\n");
 
-        performOCR(
-            "pill_image.jpg",
-            medicines,
-            &count
-        );
+        performOCR("pill_image.jpg",
+                   medicines,
+                   &count);
     }
 
     else if(choice == 2) {
 
         printf("\n[INFO] Manual Medicine Entry Selected\n");
 
-        inputMedicines(medicines, &count);
+        inputMedicines(medicines,
+                       &count);
     }
 
     else {
@@ -213,22 +299,16 @@ int main() {
         printf("\nInvalid Choice!\n");
         return 0;
     }
-
-    if(count == 0) {
-
-        return 0;
-    }
-
     printf("\nDetected Medicines:\n");
 
     for(int i = 0; i < count; i++) {
 
         printf("- %s\n", medicines[i]);
     }
-
     printf("\nChecking Drug Interactions...\n");
 
-    checkInteractions(medicines, count);
+    checkInteractions(medicines,
+                      count);
 
     printf("\n====================================");
     printf("\nSystem Scan Completed");
