@@ -1,242 +1,340 @@
 <html>
 <head>
-<title>MedPlus - Drug Interaction Warning System</title>
-<style>
-{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    font-family:Arial, sans-serif;
-}
-body{
-    background:#f2f6ff;
-    overflow:hidden; 
-}
-.intro-page{
-    height:100vh;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    background:linear-gradient(135deg,#2563eb,#4f8cff);
-}
+    <title>MedPlus - Drug Interaction Warning System</title>
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --primary-hover: #1d4ed8;
+            --white: #ffffff;
+            --text-dark: #1f2937;
+            --text-light: #6b7280;
+            --bg-gradient: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);
+            --shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
 
-.intro-card{
-    width:350px;
-    background:white;
-    padding:40px 25px;
-    border-radius:20px;
-    text-align:center;
-    box-shadow:0 4px 15px rgba(0,0,0,0.2);
-}
-.logo img{
-    width:140px;
-    margin-bottom:20px;
-}
-.intro-card h1{
-    color:#2563eb;
-    margin-bottom:20px;
-    font-size:30px;
-}
+         {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
 
-.intro-card p{
-    color:#555;
-    font-size:15px;
-    line-height:1.5;
-    margin-bottom:30px;
-}
-.start-btn{
-    display:inline-block;
-    padding:14px 30px;
-    background:#2563eb;
-    color:white;
-    text-decoration:none;
-    border-radius:10px;
-    font-size:18px;
-    transition:0.3s;
-}
+        body {
+            background: var(--bg-gradient);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+        .page {
+            display: none;
+            width: 100%;
+            height: 100vh;
+            justify-content: center;
+            align-items: center;
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: var(--bg-gradient);
+            animation: fadeIn 0.6s ease;
+        }
+        .page:target {
+            display: flex;
+        }
+        #page-intro {
+            display: flex;
+        }
 
-.start-btn:hover{
-    background:#1e4fc7;
-}
-#main-page{
-    display:none;
-    justify-content:center;
-    align-items:center;
-    height:100vh;
-}
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
-#main-page:target{
-    display:flex;
-}
-.container{
-    width:380px;
-    background:white;
-    border-radius:20px;
-    overflow:hidden;
-    box-shadow:0 4px 15px rgba(0,0,0,0.2);
-}
-.header{
-    background:#2563eb;
-    color:white;
-    text-align:center;
-    padding:20px;
-}
+        .card {
+            width: 400px;
+            background: var(--white);
+            padding: 40px;
+            border-radius: 24px;
+            box-shadow: var(--shadow);
+            text-align: center;
+        }
 
-.header-logo img{
-    width:80px;
-    background:white;
-    padding:8px;
-    border-radius:15px;
-    margin-bottom:10px;
-}
-.header h1{
-    font-size:24px;
-    margin-bottom:8px;
-}
+        .logo img {
+            width: 100px;
+            height: 100px;
+            margin-bottom: 20px;
+            object-fit: contain;
+        }
 
-.header p{
-    font-size:14px;
-}
-.main{
-    padding:20px;
-}
-.scan-box{
-    border:2px dashed #2563eb;
-    border-radius:15px;
-    padding:25px;
-    text-align:center;
-    background:#eef4ff;
-}
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            font-size: 28px;
+        }
 
-.scan-box h2{
-    color:#2563eb;
-    margin-bottom:10px;
-}
+        p {
+            color: var(--text-light);
+            font-size: 15px;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
 
-.scan-box p{
-    color:#555;
-    font-size:14px;
-    margin-bottom:15px;
-}
-input[type="file"]{
-    display:none;
-}
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
 
-.custom-file-upload{
-    display:block;
-    width:100%;
-    background:#2563eb;
-    color:white;
-    padding:14px;
-    border-radius:10px;
-    text-align:center;
-    cursor:pointer;
-    font-size:18px;
-}
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 8px;
+        }
 
-.custom-file-upload:hover{
-    background:#1e4fc7;
-}
-.warning{
-    background:#ffe5e5;
-    border-left:5px solid red;
-    padding:15px;
-    border-radius:10px;
-    margin-top:20px;
-}
+        input, select {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            outline: none;
+            color: var(--text-dark);
+        }
 
-.warning h3{
-    color:red;
-    margin-bottom:10px;
-}
+        input:focus, select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+        }
 
-.warning p{
-    color:#444;
-    font-size:14px;
-    line-height:1.5;
-}
-.footer{
-    text-align:center;
-    padding:15px;
-    background:#f1f5ff;
-    font-size:13px;
-    color:#666;
-}
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background: var(--primary-color);
+            color: var(--white);
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            margin-bottom: 15px;
+        }
 
-</style>
+        .btn:hover {
+            background: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(37, 99, 235, 0.2);
+        }
 
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .btn-outline:hover {
+            background: var(--primary-color);
+            color: var(--white);
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 20px 0;
+            color: #9ca3af;
+            font-size: 13px;
+        }
+
+        .divider::before, .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: #e5e7eb;
+        }
+
+        .divider span {
+            padding: 0 10px;
+        }
+
+        .back-link {
+            display: block;
+            margin-top: 15px;
+            color: var(--text-light);
+            text-decoration: none;
+            font-size: 14px;
+        }
+        .back-link:hover { color: var(--primary-color); }
+
+        .hidden { display: none; }
+
+        .container {
+            width: 380px;
+            background: var(--white);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+        }
+
+        .header {
+            background: var(--primary-color);
+            color: var(--white);
+            padding: 25px;
+            text-align: center;
+        }
+
+        .header-logo img {
+            width: 70px;
+            border-radius: 12px;
+            background: var(--white);
+            padding: 5px;
+            margin-bottom: 10px;
+        }
+
+        .header h1 { color: var(--white); margin-bottom: 5px; font-size: 22px; }
+        .header p { color: #bfdbfe; font-size: 13px; margin: 0; }
+
+        .main { padding: 25px; }
+
+        .scan-box {
+            border: 2px dashed var(--primary-color);
+            border-radius: 16px;
+            padding: 30px;
+            text-align: center;
+            background: #eff6ff;
+            transition: 0.3s;
+        }
+
+        .scan-box:hover {
+            background: #dbeafe;
+            transform: scale(1.02);
+        }
+
+        .scan-box h2 { color: var(--primary-color); margin-bottom: 10px; }
+        .scan-box p { margin-bottom: 15px; font-size: 14px; }
+
+        .upload-btn {
+            display: inline-block;
+            width: 100%;
+            padding: 12px;
+            background: var(--primary-color);
+            color: var(--white);
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        
+        .upload-btn:hover { background: var(--primary-hover); }
+
+        input[type="file"] { display: none; }
+
+        .warning {
+            background: #fef2f2;
+            border-left: 5px solid #ef4444;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 8px;
+            transition: 0.3s;
+        }
+        
+        .warning:hover { transform: translateX(5px); box-shadow: 0 5px 15px rgba(239, 68, 68, 0.1); }
+
+        .warning h3 { color: #ef4444; font-size: 16px; margin-bottom: 8px; }
+        .warning p { color: #555; font-size: 14px; margin: 0; line-height: 1.5; }
+
+        .footer {
+            text-align: center;
+            padding: 15px;
+            background: #f9fafb;
+            border-top: 1px solid #f3f4f6;
+            color: #9ca3af;
+            font-size: 12px;
+        }
+    </style>
 </head>
-
 <body>
-<div class="intro-page">
+    <div id="page-intro" class="page">
+        <div class="card">
+            <div class="logo">
+                <!-- Placing a generic medical icon URL -->
+                <img src="med.jpg" alt="MedPlus Logo">
+            </div>
 
-    <div class="intro-card">
+            <h1>Welcome To MedPlus</h1>
+            <p>
+                Scan your medicines and get instant warnings about dangerous drug interactions using our advanced OCR technology.
+            </p>
 
-        <div class="logo">
-            <img src="medplus-logo.jpg" alt="MedPlus Logo">
+            <select class="form-group">
+                <option> Select Language</option>
+                <option>English</option>
+                <option>हिन्दी (Hindi)</option>
+                <option>বাংলা (Bengali)</option>
+                <option>தமிழ் (Tamil)</option>
+                <option>తెలుగు (Telugu)</option>
+            </select>
+
+            <a href="#page-login" class="btn">Log In</a>
+            
+            <div class="divider"><span>OR</span></div>
+            
+            <a href="#page-main" class="btn btn-outline">Sign Up</a>
         </div>
-
-        <h1>Welcome To MedPlus</h1>
-
-        <p>
-            Scan your medicines and get instant warnings
-            about dangerous drug interactions using OCR technology.
-        </p>
-
-        <a href="#main-page" class="start-btn">Start</a>
-
     </div>
-
-</div>
-<div id="main-page">
-
-    <div class="container">
-
-        <div class="header">
-
-            <div class="header-logo">
-                <img src="medplus-logo.jpg" alt="MedPlus Logo">
+    <div id="page-login" class="page">
+        <div class="card">
+            <div class="logo">
+                <img src="med.jpg" alt="MedPlus Logo">
             </div>
+            <h1>Patient Login</h1>
+            <p>Verify your identity and delivery details.</p>
 
-            <h1>Drug Interaction Warning</h1>
+            <form onsubmit="event.preventDefault(); window.location.hash='page-main';">
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" placeholder="name@example.com" required>
+                </div>
+                <button type="submit" class="btn">Continue</button>
+            </form>
 
-            <p>OCR Based Medicine Safety System</p>
-
+            <a href="#page-intro" class="back-link">Back to Home</a>
         </div>
-
-        <div class="main">
-            <div class="scan-box">
-
-                <h2>Scan Pill Bottle</h2>
-
-                <p>
-                    Upload medicine label image to detect medicines using OCR.
-                </p>
-
-                <label for="file-upload" class="custom-file-upload">
-                    Upload Image
-                </label>
-
-                <input type="file" id="file-upload" accept="image/*">
-
-            </div>
-            <div class="warning">
-
-                <h3>Severe Interaction Warning</h3>
-
-                <p>
-                    Warfarin and Aspirin may increase the risk of bleeding.
-                    Please consult your doctor immediately before taking
-                    both medicines together.
-                </p>
-
-            </div>
-
-        </div>
-
     </div>
+    <div id="page-main" class="page">
+        <div class="container">
+            <div class="header">
+                <div class="header-logo">
+                    <img src="med.jpg" alt="MedPlus Logo">
+                </div>
+                <h1>Drug Interaction Warning</h1>
+                <p>OCR Based Medicine Safety System</p>
+            </div>
 
-</div>
+            <div class="main">
+                <div class="scan-box">
+                    <h2>Upload Prescription</h2>
+                    <p>Upload an image of your medicine label or prescription to detect interactions.</p>
+                    
+                    <label for="file-upload" class="upload-btn">
+                         Upload Image
+                    </label>
+                    <input type="file" id="file-upload" accept="image/*">
+                </div>
+
+                <div class="warning">
+                    <h3> Severe Interaction</h3>
+                    <p>
+                        <strong>Warfarin + Aspirin:</strong> Concurrent use significantly increases the risk of internal bleeding. Please consult your doctor immediately.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
 
 </body>
 </html>
