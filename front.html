@@ -1,9 +1,11 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Drug Interaction Warning System</title>
+
+<title>MedPlus - Drug Interaction Warning System</title>
 
 <style>
 *{
@@ -13,27 +15,109 @@
     font-family:Arial, sans-serif;
 }
 
+/* BODY */
+
 body{
     background:#f2f6ff;
+    overflow:hidden; 
+}
+
+/* INTRO PAGE */
+
+.intro-page{
+    height:100vh;
     display:flex;
     justify-content:center;
     align-items:center;
-    min-height:100vh;
+    background:linear-gradient(135deg,#2563eb,#4f8cff);
 }
+
+.intro-card{
+    width:350px;
+    background:white;
+    padding:40px 25px;
+    border-radius:20px;
+    text-align:center;
+    box-shadow:0 4px 15px rgba(0,0,0,0.2);
+}
+
+/* LOGO */
+
+.logo img{
+    width:140px;
+    margin-bottom:20px;
+}
+
+/* INTRO TEXT */
+
+.intro-card h1{
+    color:#2563eb;
+    margin-bottom:20px;
+    font-size:30px;
+}
+
+.intro-card p{
+    color:#555;
+    font-size:15px;
+    line-height:1.5;
+    margin-bottom:30px;
+}
+
+/* START BUTTON */
+
+.start-btn{
+    display:inline-block;
+    padding:14px 30px;
+    background:#2563eb;
+    color:white;
+    text-decoration:none;
+    border-radius:10px;
+    font-size:18px;
+    transition:0.3s;
+}
+
+.start-btn:hover{
+    background:#1e4fc7;
+}
+
+/* MAIN PAGE */
+
+#main-page{
+    display:none;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+}
+
+#main-page:target{
+    display:flex;
+}
+
+/* APP CONTAINER */
 
 .container{
     width:380px;
     background:white;
     border-radius:20px;
-    box-shadow:0 4px 15px rgba(0,0,0,0.2);
     overflow:hidden;
+    box-shadow:0 4px 15px rgba(0,0,0,0.2);
 }
+
+/* HEADER */
 
 .header{
     background:#2563eb;
     color:white;
     text-align:center;
-    padding:25px;
+    padding:20px;
+}
+
+.header-logo img{
+    width:80px;
+    background:white;
+    padding:8px;
+    border-radius:15px;
+    margin-bottom:10px;
 }
 
 .header h1{
@@ -45,22 +129,20 @@ body{
     font-size:14px;
 }
 
+/* MAIN CONTENT */
+
 .main{
     padding:20px;
 }
 
+/* SCAN BOX */
+
 .scan-box{
     border:2px dashed #2563eb;
     border-radius:15px;
-    padding:30px;
+    padding:25px;
     text-align:center;
     background:#eef4ff;
-    margin-bottom:20px;
-}
-
-.scan-box img{
-    width:80px;
-    margin-bottom:15px;
 }
 
 .scan-box h2{
@@ -69,45 +151,34 @@ body{
 }
 
 .scan-box p{
-    font-size:14px;
     color:#555;
+    font-size:14px;
+    margin-bottom:15px;
 }
 
-.upload-btn{
+/* FILE UPLOAD */
+
+input[type="file"]{
+    display:none;
+}
+
+.custom-file-upload{
     display:block;
     width:100%;
     background:#2563eb;
     color:white;
-    text-align:center;
     padding:14px;
     border-radius:10px;
-    text-decoration:none;
+    text-align:center;
+    cursor:pointer;
     font-size:18px;
-    margin-top:15px;
 }
 
-.upload-btn:hover{
+.custom-file-upload:hover{
     background:#1e4fc7;
 }
 
-.section-title{
-    margin:20px 0 10px;
-    color:#222;
-    font-size:20px;
-}
-
-.medicine-list{
-    background:#f8f8f8;
-    border-radius:10px;
-    padding:15px;
-}
-
-.medicine{
-    display:flex;
-    justify-content:space-between;
-    margin-bottom:12px;
-    font-size:16px;
-}
+/* WARNING BOX */
 
 .warning{
     background:#ffe5e5;
@@ -125,7 +196,10 @@ body{
 .warning p{
     color:#444;
     font-size:14px;
+    line-height:1.5;
 }
+
+/* FOOTER */
 
 .footer{
     text-align:center;
@@ -134,57 +208,93 @@ body{
     font-size:13px;
     color:#666;
 }
+
 </style>
+
 </head>
 
 <body>
 
-<div class="container">
+<!-- INTRO PAGE -->
 
-    <div class="header">
-        <h1>Drug Interaction Warning</h1>
-        <p>OCR Based Medicine Safety System</p>
+<div class="intro-page">
+
+    <div class="intro-card">
+
+        <div class="logo">
+            <img src="medplus-logo.jpg" alt="MedPlus Logo">
+        </div>
+
+        <h1>Welcome To MedPlus</h1>
+
+        <p>
+            Scan your medicines and get instant warnings
+            about dangerous drug interactions using OCR technology.
+        </p>
+
+        <a href="#main-page" class="start-btn">Start</a>
+
     </div>
 
-    <div class="main">
+</div>
 
-        <div class="scan-box">
-            
-            <h2>Scan Pill Bottle</h2>
-            <p>Upload medicine label image to detect medicines using OCR.</p>
+<!-- MAIN PAGE -->
 
-            <a href="#" class="upload-btn">Upload Image</a>
+<div id="main-page">
+
+    <div class="container">
+
+        <div class="header">
+
+            <div class="header-logo">
+                <img src="medplus-logo.jpg" alt="MedPlus Logo">
+            </div>
+
+            <h1>Drug Interaction Warning</h1>
+
+            <p>OCR Based Medicine Safety System</p>
+
         </div>
 
-        <h2 class="section-title">Detected Medicines</h2>
+        <div class="main">
 
-        <div class="medicine-list">
-            <div class="medicine">
-                <span>Paracetamol</span>
-                <span>500mg</span>
+            <!-- SCAN BOX -->
+
+            <div class="scan-box">
+
+                <h2>Scan Pill Bottle</h2>
+
+                <p>
+                    Upload medicine label image to detect medicines using OCR.
+                </p>
+
+                <label for="file-upload" class="custom-file-upload">
+                    Upload Image
+                </label>
+
+                <input type="file" id="file-upload" accept="image/*">
+
             </div>
 
-            <div class="medicine">
-                <span>Warfarin</span>
-                <span>5mg</span>
+            <!-- WARNING -->
+
+            <div class="warning">
+
+                <h3>Severe Interaction Warning</h3>
+
+                <p>
+                    Warfarin and Aspirin may increase the risk of bleeding.
+                    Please consult your doctor immediately before taking
+                    both medicines together.
+                </p>
+
             </div>
 
-            <div class="medicine">
-                <span>Aspirin</span>
-                <span>75mg</span>
-            </div>
-        </div>
-
-        <div class="warning">
-            <h3>⚠ Severe Interaction Warning</h3>
-            <p>
-                Warfarin and Aspirin may increase the risk of bleeding.
-                Please consult your doctor immediately before taking both medicines together.
-            </p>
         </div>
 
     </div>
 
 </div>
+
 </body>
 </html>
