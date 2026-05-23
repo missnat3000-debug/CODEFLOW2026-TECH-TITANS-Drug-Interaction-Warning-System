@@ -292,7 +292,7 @@
                 <img src="med.jpg" alt="MedPlus Logo">
             </div>
             <h1>Patient Login</h1>
-            <p>Verify your identity and delivery details.</p>
+            <p>Verify your identity.</p>
 
             <form onsubmit="event.preventDefault(); window.location.hash='page-main';">
                 <div class="form-group">
@@ -394,7 +394,7 @@
 
             <div class="main">
                 <div class="scan-box">
-                    <h2>Upload Prescription</h2>
+            <h2>Upload Medicine</h2>
                     <p>Upload an image of your medicine label or prescription to detect interactions.</p>
                     
                     <label for="file-upload" class="upload-btn">
@@ -412,6 +412,351 @@
             </div>
         </div>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
+
+<script>
+
+// =====================================
+// MEDICINE DATABASE
+// =====================================
+
+const knownDrugs = [
+
+    "aspirin",
+    "warfarin",
+    "ibuprofen",
+    "paracetamol",
+    "acetaminophen",
+    "metformin",
+    "amoxicillin",
+    "azithromycin",
+    "atorvastatin",
+    "clopidogrel",
+    "diclofenac",
+    "pantoprazole",
+    "omeprazole",
+    "cetirizine",
+    "levocetirizine",
+    "dolo",
+    "crocin",
+    "calpol",
+    "insulin",
+    "losartan",
+    "amlodipine",
+    "telmisartan",
+    "enalapril",
+    "ramipril",
+    "alprazolam",
+    "diazepam",
+    "lorazepam",
+    "cefixime",
+    "ciprofloxacin",
+    "metronidazole",
+    "thyroxine",
+    "sertraline",
+    "tramadol"
+
+];
+
+// =====================================
+// INTERACTION DATABASE
+// =====================================
+
+const interactions = [
+
+    {
+        drugs: ["warfarin", "aspirin"],
+        warning: "Warfarin + Aspirin increases severe bleeding risk."
+    },
+
+    {
+        drugs: ["ibuprofen", "aspirin"],
+        warning: "Ibuprofen may reduce Aspirin effect."
+    },
+
+    {
+        drugs: ["metformin", "insulin"],
+        warning: "Metformin + Insulin may cause low sugar."
+    },
+
+    {
+        drugs: ["tramadol", "sertraline"],
+        warning: "Tramadol + Sertraline may cause serotonin syndrome."
+    }
+
+];
+
+// =====================================
+// CREATE CAMERA BUTTONS
+// =====================================
+
+const scanBox = document.querySelector(".scan-box");
+
+scanBox.innerHTML += `
+
+<br>
+
+<button class="upload-btn" onclick="openCamera()">
+📷 Open Camera
+</button>
+
+<br><br>
+
+<video id="camera" autoplay playsinline
+style="width:100%; border-radius:12px; display:none;"></video>
+
+<br>
+
+<button id="captureBtn"
+class="upload-btn"
+style="display:none;"
+onclick="captureImage()">
+
+📸 Capture Medicine
+
+</button>
+
+<br><br>
+
+<canvas id="canvas" style="display:none;"></canvas>
+
+<img id="preview-image"
+style="width:100%; border-radius:12px; display:none;">
+
+<div id="detected-result"
+class="warning"
+style="display:none;">
+
+<h3>Detected Medicines</h3>
+
+<p id="medicine-list"></p>
+
+</div>
+
+<div id="interaction-result"
+class="warning"
+style="display:none;">
+
+<h3>Drug Interaction Warning</h3>
+
+<p id="interaction-text"></p>
+
+</div>
+
+`;
+
+// =====================================
+// IMAGE UPLOAD
+// =====================================
+
+document.getElementById("file-upload")
+.addEventListener("change", function(event) {
+
+    const file = event.target.files[0];
+
+    if(file){
+
+        processImage(file);
+
+    }
+
+});
+
+// =====================================
+// OPEN CAMERA
+// =====================================
+
+let stream;
+
+async function openCamera() {
+
+    try {
+
+        stream = await navigator.mediaDevices.getUserMedia({
+
+            video: {
+                facingMode: "environment"
+            }
+
+        });
+
+        const video = document.getElementById("camera");
+
+        video.srcObject = stream;
+
+        video.style.display = "block";
+
+        document.getElementById("captureBtn")
+        .style.display = "block";
+
+    }
+
+    catch(error){
+
+        alert("Camera access denied or not supported.");
+
+        console.log(error);
+
+    }
+
+}
+
+// =====================================
+// CAPTURE IMAGE
+// =====================================
+
+function captureImage() {
+
+    const video = document.getElementById("camera");
+
+    const canvas = document.getElementById("canvas");
+
+    const context = canvas.getContext("2d");
+
+    canvas.width = video.videoWidth;
+
+    canvas.height = video.videoHeight;
+
+    context.drawImage(video, 0, 0);
+
+    canvas.toBlob(function(blob){
+
+        processImage(blob);
+
+    });
+
+}
+
+// =====================================
+// PROCESS IMAGE
+// =====================================
+
+function processImage(file) {
+
+    const imageURL = URL.createObjectURL(file);
+
+    const preview = document.getElementById("preview-image");
+
+    preview.src = imageURL;
+
+    preview.style.display = "block";
+
+    Tesseract.recognize(
+
+        file,
+
+        'eng',
+
+        {
+
+            logger: m => console.log(m)
+
+        }
+
+    ).then(({ data: { text } }) => {
+
+        console.log("OCR RESULT:", text);
+
+        detectMedicines(text.toLowerCase());
+
+    });
+
+}
+
+// =====================================
+// DETECT MEDICINES
+// =====================================
+
+function detectMedicines(text) {
+
+    let detected = [];
+
+    knownDrugs.forEach(drug => {
+
+        if(text.includes(drug.toLowerCase())){
+
+            detected.push(drug);
+
+        }
+
+    });
+
+    detected = [...new Set(detected)];
+
+    const medicineBox =
+    document.getElementById("detected-result");
+
+    const medicineList =
+    document.getElementById("medicine-list");
+
+    medicineBox.style.display = "block";
+
+    if(detected.length > 0){
+
+        medicineList.innerHTML = detected.join(", ");
+
+        checkInteractions(detected);
+
+    }
+
+    else{
+
+        medicineList.innerHTML =
+        "No medicines detected.";
+
+    }
+
+}
+
+// =====================================
+// CHECK INTERACTIONS
+// =====================================
+
+function checkInteractions(detectedDrugs){
+
+    const interactionBox =
+    document.getElementById("interaction-result");
+
+    const interactionText =
+    document.getElementById("interaction-text");
+
+    let warnings = [];
+
+    interactions.forEach(item => {
+
+        const found = item.drugs.every(drug =>
+
+            detectedDrugs.includes(drug)
+
+        );
+
+        if(found){
+
+            warnings.push(item.warning);
+
+        }
+
+    });
+
+    interactionBox.style.display = "block";
+
+    if(warnings.length > 0){
+
+        interactionText.innerHTML =
+        warnings.join("<br><br>");
+
+    }
+
+    else{
+
+        interactionText.innerHTML =
+        "No dangerous interaction detected.";
+
+    }
+
+}
+
+</script>
 
 </body>
 </html>
