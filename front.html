@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Drug Interaction Warning System</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial, sans-serif;
+}
+
+body{
+    background:#f2f6ff;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    min-height:100vh;
+}
+
+.container{
+    width:380px;
+    background:white;
+    border-radius:20px;
+    box-shadow:0 4px 15px rgba(0,0,0,0.2);
+    overflow:hidden;
+}
+
+.header{
+    background:#2563eb;
+    color:white;
+    text-align:center;
+    padding:25px;
+}
+
+.header h1{
+    font-size:24px;
+    margin-bottom:8px;
+}
+
+.header p{
+    font-size:14px;
+}
+
+.main{
+    padding:20px;
+}
+
+.scan-box{
+    border:2px dashed #2563eb;
+    border-radius:15px;
+    padding:30px;
+    text-align:center;
+    background:#eef4ff;
+    margin-bottom:20px;
+}
+
+.scan-box img{
+    width:80px;
+    margin-bottom:15px;
+}
+
+.scan-box h2{
+    color:#2563eb;
+    margin-bottom:10px;
+}
+
+.scan-box p{
+    font-size:14px;
+    color:#555;
+}
+
+.upload-btn{
+    display:block;
+    width:100%;
+    background:#2563eb;
+    color:white;
+    text-align:center;
+    padding:14px;
+    border-radius:10px;
+    text-decoration:none;
+    font-size:18px;
+    margin-top:15px;
+}
+
+.upload-btn:hover{
+    background:#1e4fc7;
+}
+
+.section-title{
+    margin:20px 0 10px;
+    color:#222;
+    font-size:20px;
+}
+
+.medicine-list{
+    background:#f8f8f8;
+    border-radius:10px;
+    padding:15px;
+}
+
+.medicine{
+    display:flex;
+    justify-content:space-between;
+    margin-bottom:12px;
+    font-size:16px;
+}
+
+.warning{
+    background:#ffe5e5;
+    border-left:5px solid red;
+    padding:15px;
+    border-radius:10px;
+    margin-top:20px;
+}
+
+.warning h3{
+    color:red;
+    margin-bottom:10px;
+}
+
+.warning p{
+    color:#444;
+    font-size:14px;
+}
+
+.footer{
+    text-align:center;
+    padding:15px;
+    background:#f1f5ff;
+    font-size:13px;
+    color:#666;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="header">
+        <h1>Drug Interaction Warning</h1>
+        <p>OCR Based Medicine Safety System</p>
+    </div>
+
+    <div class="main">
+
+        <div class="scan-box">
+            
+            <h2>Scan Pill Bottle</h2>
+            <p>Upload medicine label image to detect medicines using OCR.</p>
+
+            <a href="#" class="upload-btn">Upload Image</a>
+        </div>
+
+        <h2 class="section-title">Detected Medicines</h2>
+
+        <div class="medicine-list">
+            <div class="medicine">
+                <span>Paracetamol</span>
+                <span>500mg</span>
+            </div>
+
+            <div class="medicine">
+                <span>Warfarin</span>
+                <span>5mg</span>
+            </div>
+
+            <div class="medicine">
+                <span>Aspirin</span>
+                <span>75mg</span>
+            </div>
+        </div>
+
+        <div class="warning">
+            <h3>⚠ Severe Interaction Warning</h3>
+            <p>
+                Warfarin and Aspirin may increase the risk of bleeding.
+                Please consult your doctor immediately before taking both medicines together.
+            </p>
+        </div>
+
+    </div>
+
+</div>
+</body>
+</html>
