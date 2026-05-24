@@ -39,18 +39,31 @@
             color: #f1f5f9;
             overflow-x: hidden;
         }
-        html, body {
-            height: 100%;
-            overflow: auto;
-        }
-
-        .page {
+        html,
+body {
+    height: 100%;
+    margin: 0;
+    overflow: hidden;
+}
+.page {
     display: none;
-    min-height: 100vh;
+    height: 100vh;
+    overflow: hidden;
 }
 
 .page.active-page {
     display: block;
+}
+#page-intro.active-page,
+#page-login.active-page,
+#page-signup.active-page {
+    display: flex;
+    overflow: hidden;
+}
+#page-main.active-page {
+    display: block;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
 #page-intro.active-page,
@@ -316,13 +329,11 @@
             transition: color 0.2s;
         }
         .back-link:hover { color: var(--indigo); }
-
-        /* ── MAIN SCAN APP ── */
         #page-main {
-            background: #090d16;
-            min-height: 100vh;
-            display: none;
-        }
+    background: #090d16;
+    height: 100vh;
+    display: none;
+}
         #page-main:target { display: block; }
 
         .app-header {
@@ -917,17 +928,23 @@
         <h1>MedPlus</h1>
         <p>Scan medicine labels or barcodes. Get instant AI-powered drug interaction warnings.</p>
 
-        <label style="display:none;" for="language-select">Select Language</label>
         <select class="lang-select" id="language-select" required>
+    <option value="" disabled selected>Select Language</option>
             <option value="English" selected>English</option>
             <option value="Hindi">हिन्दी (Hindi)</option>
             <option value="Bengali">বাংলা (Bengali)</option>
             <option value="Tamil">தமிழ் (Tamil)</option>
             <option value="Telugu">తెలుగు (Telugu)</option>
         </select>
-        <a href="javascript:void(0)" onclick="showPage('page-login')" class="btn-primary"></a>Log In</a>
-        <div class="or-divider"><span>OR</span></div>
-        <a href="javascript:void(0)" onclick="showPage('page-signup')" class="btn-outline"></a>Create Account</a>
+        <a href="javascript:void(0)" onclick="showPage('page-login')" class="btn-primary">
+    Log In
+</a>
+
+<div class="or-divider"><span>OR</span></div>
+
+<a href="javascript:void(0)" onclick="showPage('page-signup')" class="btn-outline">
+    Create Account
+</a>
     </div>
 </div>
 
@@ -942,7 +959,9 @@
             </div>
             <button type="submit" class="btn-submit">Continue →</button>
         </form>
-        <a href="javascript:void(0)" onclick="showPage('page-intro')" class="back-link"></a>← Back to Home</a>
+        <a href="javascript:void(0)" onclick="showPage('page-intro')" class="back-link">
+    ← Back to Home
+</a>
     </div>
 </div>
 
@@ -950,8 +969,8 @@
     <div class="auth-card">
         <h1>Create Account</h1>
         <p>Register to scan your prescriptions securely.</p>
-        <form onsubmit="event.preventDefault(); showPage('page-main');"></form>
-            <div class="form-group">
+<form onsubmit="event.preventDefault(); showPage('page-main');">
+                <div class="form-group">
                 <label for="signup-name">Full Name</label>
                 <input id="signup-name" type="text" placeholder="Your full name" required />
             </div>
@@ -1229,49 +1248,90 @@ async function processBarcodeScan(barcodeText) {
     }
 }
 async function processImage(file) {
+
+    if (!file) {
+        showToast("No image selected");
+        return;
+    }
+
+    console.log("FILE:", file);
+
     document.getElementById("scan-loading").style.display = "block";
+
     document.getElementById("results-section").style.display = "none";
-    
-    setStatus("🔍 Preparing drug visual image...");
-    
-    const imageURL = URL.createObjectURL(file);
-    document.getElementById("preview-wrap").style.display = "block";
-    document.getElementById("preview-img").src = imageURL;
-    
-    const selectedLanguage = localStorage.getItem("medplus_language") || "English";
-    
+
     try {
+
+        // PREVIEW
+
+        const imageURL = URL.createObjectURL(file);
+
+        document.getElementById("preview-wrap").style.display = "block";
+
+        document.getElementById("preview-img").src = imageURL;
+
+        // FORM DATA
+
         const formData = new FormData();
+
         formData.append("image", file);
-        formData.append("language", selectedLanguage);
-        
-        setStatus("🤖 AI scanning image package & composition...");
-        
+
+        console.log("Sending image to backend...");
+
+        setStatus("Uploading image...");
+
+        // FETCH
+
         const response = await fetch("http://127.0.0.1:5000/scan", {
             method: "POST",
             body: formData
         });
-        
-        if (!response.ok) {
-            const errData = await response.json();
-            throw new Error(errData.error || "Backend analysis response failed.");
+
+        console.log("STATUS:", response.status);
+
+        // RAW RESPONSE
+
+        const raw = await response.text();
+
+        console.log("RAW RESPONSE:", raw);
+
+        let data;
+
+        try {
+            data = JSON.parse(raw);
+        } catch (e) {
+
+            console.error("JSON ERROR:", e);
+
+            throw new Error("Backend returned invalid JSON");
         }
-        
-        const data = await response.json();
-        console.log("IMAGE SCAN RESPONSE:", data);
-        
+
         document.getElementById("scan-loading").style.display = "none";
-        
+
+        // SUCCESS
+
         if (data.success) {
-            renderResults(data.medicines, data.interactions || [], data.drug_present);
-            showToast("Analysis complete!");
+
+            renderResults(
+                data.medicines || [],
+                data.interactions || [],
+                data.drug_present || false
+            );
+
+            showToast("Scan completed");
+
         } else {
-            showToast(data.error || "Analysis was unsuccessful.");
+
+            showToast(data.error || "Scan failed");
         }
+
     } catch (error) {
-        console.error("Visual processing error:", error);
+
+        console.error("UPLOAD ERROR:", error);
+
         document.getElementById("scan-loading").style.display = "none";
-        showToast(error.message || "Failed to reach scanning backend server.");
+
+        showToast(error.message || "Upload failed");
     }
 }
 function renderResults(medicines, interactions, drugPresent) {
@@ -1663,12 +1723,10 @@ function showToast(msg) {
     setTimeout(() => { t.style.display = "none"; }, 3500);
 }
 window.addEventListener("DOMContentLoaded", () => {
-    const savedLanguage = localStorage.getItem("medplus_language") || "English";
-
+    const savedLanguage = localStorage.getItem("medplus_language") || "Select Language";
     document.getElementById("language-select").value = savedLanguage;
 
     applyTranslation(savedLanguage);
-
     showPage("page-intro");
 });
 </script>
