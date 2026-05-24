@@ -1,5 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -29,9 +28,7 @@
             --violet: #8b5cf6;
             --neon-laser: #10b981;
         }
-
         * { box-sizing: border-box; margin: 0; padding: 0; }
-
         body {
             font-family: 'DM Sans', sans-serif;
             background: radial-gradient(circle at top left, #1e1b4b 0%, #0f172a 45%, #020617 100%);
@@ -1221,7 +1218,7 @@ async function processBarcodeScan(barcodeText) {
     setStatus(`🔍 Resolving Barcode ${barcodeText}...`);
     
     try {
-        const response = await fetch("http://127.0.0.1:5000/scan-barcode", {
+        const response = await fetch("/scan-barcode", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -1289,7 +1286,7 @@ async function processImage(file) {
 
         // FETCH
 
-        const response = await fetch("http://127.0.0.1:5000/scan", {
+        const response = await fetch("/scan", {
             method: "POST",
             body: formData
         });
@@ -1305,14 +1302,18 @@ async function processImage(file) {
         let data;
 
         try {
-            data = JSON.parse(raw);
-        } catch (e) {
 
-            console.error("JSON ERROR:", e);
+    data = JSON.parse(raw);
 
-            throw new Error("Backend returned invalid JSON");
-        }
+} catch(e) {
 
+    console.error("INVALID JSON RESPONSE:");
+    console.error(raw);
+
+    throw new Error(
+        "Backend returned invalid JSON.\nCheck Flask terminal."
+    );
+}
         document.getElementById("scan-loading").style.display = "none";
 
         // SUCCESS
@@ -1528,7 +1529,7 @@ document.getElementById("capture-btn").addEventListener("click", () => {
     canvas.toBlob(blob => {
         stopCamera();
         if (blob) {
-            // Standardize Blob with name for Flask upload
+
             const file = new File([blob], "captured_medicine.jpg", { type: "image/jpeg" });
             processImage(file);
         }
@@ -1545,8 +1546,6 @@ function stopCamera() {
     document.getElementById("camera-stream").style.display = "none";
     document.getElementById("capture-wrap").style.display = "none";
 }
-
-// File Upload Trigger
 document.getElementById("file-upload").addEventListener("change", async (e) => {
     const file = e.target.files[0];
 
@@ -1674,11 +1673,9 @@ const TRANSLATIONS = {
         stopScanBtn: "✕ స్కాన్ ఆపు"
     }
 };
-
 function applyTranslation(language) {
     const t = TRANSLATIONS[language] || TRANSLATIONS.English;
 
-    // Apply main translation strings
     document.querySelector(".intro-card h1").textContent = t.introTitle;
     document.querySelector(".intro-card p").textContent = t.introText;
     document.querySelector(".btn-primary").textContent = t.loginBtn;
@@ -1692,28 +1689,23 @@ function applyTranslation(language) {
     document.querySelector("#page-signup p").textContent = t.signupText;
     document.querySelector("#page-signup .btn-submit").textContent = t.registerBtn;
 
-    // Visual scan tab strings
     document.getElementById("scan-zone-title").textContent = t.scanTitle;
     document.getElementById("scan-zone-desc").textContent = t.scanText;
     document.querySelector("label.act-btn.primary").textContent = t.uploadBtn;
     document.getElementById("camera-btn").textContent = t.cameraBtn;
 
-    // Live barcode tab strings
     document.getElementById("scanner-title").textContent = t.liveScannerTitle;
     document.getElementById("scanner-desc").textContent = t.liveScannerDesc;
     document.getElementById("start-barcode-btn").textContent = t.startScanBtn;
     document.getElementById("stop-barcode-btn").textContent = t.stopScanBtn;
 }
 
-// Language selector event listener
 document.getElementById("language-select").addEventListener("change", function() {
     const selectedLanguage = this.value;
     localStorage.setItem("medplus_language", selectedLanguage);
     applyTranslation(selectedLanguage);
     showToast(`Language updated to ${selectedLanguage}`);
 });
-
-// Load saved configuration
 window.addEventListener("DOMContentLoaded", () => {
     const savedLanguage = localStorage.getItem("medplus_language") || "English";
     document.getElementById("language-select").value = savedLanguage;
@@ -1729,11 +1721,23 @@ function showToast(msg) {
     setTimeout(() => { t.style.display = "none"; }, 3500);
 }
 window.addEventListener("DOMContentLoaded", () => {
-    const savedLanguage = localStorage.getItem("medplus_language") || "Select Language";
-    document.getElementById("language-select").value = savedLanguage;
+
+    const savedLanguage =
+        localStorage.getItem("medplus_language")
+        || "English";
+
+    document.getElementById("language-select").value =
+        savedLanguage;
 
     applyTranslation(savedLanguage);
-    showPage("page-intro");
+
+    // OPEN INTRO ONLY FIRST TIME
+
+    if (
+        !document.querySelector(".active-page")
+    ) {
+        showPage("page-intro");
+    }
 });
 </script>
 </body>
