@@ -582,14 +582,13 @@ html, body {
         <h1>MedPlus</h1>
         <p>Scan medicine labels or barcodes. Get instant AI-powered drug interaction warnings.</p>
 
-        <select class="lang-select" id="language-select">
-            <option value="English">English</option>
-            <option value="Hindi">हिन्दी (Hindi)</option>
-            <option value="Bengali">বাংলা (Bengali)</option>
-            <option value="Tamil">தமிழ் (Tamil)</option>
-            <option value="Telugu">తెలుగు (Telugu)</option>
-        </select>
-
+        <select class="lang-select" id="language-select" required>
+    <option value="English" selected>English</option>
+    <option value="Hindi">हिन्दी (Hindi)</option>
+    <option value="Bengali">বাংলা (Bengali)</option>
+    <option value="Tamil">தமிழ் (Tamil)</option>
+    <option value="Telugu">తెలుగు (Telugu)</option>
+</select>
         <a href="#page-login" class="btn-primary">Log In</a>
         <div class="or-divider"><span>OR</span></div>
         <a href="#page-signup" class="btn-outline">Create Account</a>
@@ -1304,9 +1303,8 @@ document.getElementById("language-select").addEventListener("change", function()
 
 window.addEventListener("DOMContentLoaded", () => {
 
-    const savedLanguage =
-        localStorage.getItem("medplus_language") || "English";
-
+    const savedLanguage = "English";
+localStorage.setItem("medplus_language", savedLanguage);
     document.getElementById("language-select").value = savedLanguage;
 
     applyTranslation(savedLanguage);
