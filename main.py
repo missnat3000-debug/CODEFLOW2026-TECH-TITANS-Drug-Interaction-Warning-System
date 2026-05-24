@@ -7,8 +7,8 @@ import traceback
 import uuid
 
 from flask import Flask, request, jsonify, send_from_directory
+from werkzeug.exceptions import HTTPException
 from flask_cors import CORS
-from werkzeug.utils import secure_filename
 
 from PIL import Image
 import google.generativeai as genai
@@ -18,9 +18,6 @@ import requests
 
 load_dotenv()
 
-# =========================
-# UTF-8 FIX (Windows)
-# =========================
 if sys.platform.startswith("win"):
     try:
         sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8")
@@ -30,6 +27,9 @@ if sys.platform.startswith("win"):
 
 app = Flask(__name__)
 CORS(app)
+
+# Allow up to 16 MB image uploads to prevent "Payload Too Large" crashes
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024 
 
 UPLOAD_FOLDER = "uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
@@ -42,22 +42,22 @@ if not GEMINI_API_KEY:
 
 genai.configure(api_key=GEMINI_API_KEY)
 
-# =========================
-# OCR INIT
-# =========================
+@app.errorhandler(Exception)
+def handle_exception(e):
+    if isinstance(e, HTTPException):
+        return jsonify({"success": False, "error": e.description}), e.code
+    
+    traceback.print_exc()
+    return jsonify({"success": False, "error": "Internal Server Error", "details": str(e)}), 500
 try:
     reader = easyocr.Reader(['en'])
     print("EasyOCR Loaded Successfully")
-except:
+except Exception as e:
+    print(f"Warning: EasyOCR failed to load. Error: {e}")
     reader = None
 
-
-# =========================
-# UTIL FUNCTIONS
-# =========================
 def allowed_file(filename):
     return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
-
 
 def detect_qr(image_path):
     try:
@@ -68,7 +68,6 @@ def detect_qr(image_path):
     except:
         return None
 
-
 def extract_text(image_path):
     if not reader:
         return ""
@@ -77,7 +76,6 @@ def extract_text(image_path):
         return " ".join([r[1] for r in results]).strip()
     except:
         return ""
-
 
 def lookup_barcode(barcode):
     try:
@@ -103,10 +101,8 @@ def lookup_barcode(barcode):
             "description": "Detected via barcode database",
             "warnings": "Verify with packaging"
         }
-
     except:
         return None
-
 
 def analyze_with_gemini(image_path, text_data=""):
     try:
@@ -138,7 +134,6 @@ JSON FORMAT:
   ]
 }}
 """
-
         with Image.open(image_path) as img:
             response = model.generate_content(
                 [prompt, img],
@@ -148,17 +143,15 @@ JSON FORMAT:
                 }
             )
 
-        # Catch safety blocks or empty responses
         if not response.parts:
-            print("GEMINI ERROR: Response was blocked or empty.")
+            print("GEMINI ERROR: Response was blocked by safety settings or empty.")
             return {"drug_present": False, "medicines": []}
 
         raw = response.text.strip()
 
-        # --- THE FIX: Clean up any accidental Markdown from Gemini ---
+        # Clean markdown if Gemini hallucinates it
         if raw.startswith("```"):
             raw = raw.replace("```json", "").replace("```", "").strip()
-        # -------------------------------------------------------------
 
         print("\n===== GEMINI RESPONSE =====")
         print(raw)
@@ -177,35 +170,22 @@ JSON FORMAT:
             "medicines": []
         }
 
-# =========================
-# FRONTEND ROUTE (FIXED)
-# =========================
 @app.route("/")
 def serve_frontend():
     return send_from_directory(os.getcwd(), "front.html")
 
-
-# =========================
-# API STATUS ROUTE
-# =========================
 @app.route("/api")
 def api_home():
     return jsonify({"success": True, "message": "Medicine Scanner API Running"})
 
-
-# =========================
-# SCAN IMAGE
-# =========================
 @app.route("/scan", methods=["POST"])
 def scan():
     image_path = None
-
     try:
         if "image" not in request.files:
             return jsonify({"success": False, "error": "No image uploaded"}), 400
 
         file = request.files["image"]
-
         if file.filename == "":
             return jsonify({"success": False, "error": "Empty filename"}), 400
 
@@ -222,7 +202,6 @@ def scan():
         qr = detect_qr(image_path)
 
         medicines = []
-
         if qr:
             bar = lookup_barcode(qr)
             if bar:
@@ -251,13 +230,12 @@ def scan():
         return jsonify({"success": False, "error": str(e)}), 500
 
     finally:
+        # Safe deletion to prevent Windows file lock crashes
         if image_path and os.path.exists(image_path):
-            os.remove(image_path)
-
-
-# =========================
-# BARCODE API
-# =========================
+            try:
+                os.remove(image_path)
+            except Exception as e:
+                print(f"Warning: Could not delete temp file {image_path}: {e}")
 @app.route("/scan-barcode", methods=["POST"])
 def scan_barcode():
     try:
@@ -280,11 +258,11 @@ def scan_barcode():
             "total_medicines_detected": 1,
             "medicines": [result]
         })
+
     except Exception as e:
         traceback.print_exc()
         return jsonify({"success": False, "error": str(e)}), 500
-
 if __name__ == "__main__":
     print("Medicine Scanner API Starting...")
-    print("[http://127.0.0.1:5000/](http://127.0.0.1:5000/)")
+    print("http://127.0.0.1:5000/")
     app.run(host="0.0.0.0", port=5000, debug=False, threaded=True)
