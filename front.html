@@ -39,16 +39,25 @@
             color: #f1f5f9;
             overflow-x: hidden;
         }
-        html,
+       html,
 body {
     height: 100%;
     margin: 0;
-    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: auto;
 }
+
 .page {
     display: none;
-    height: 100vh;
-    overflow: hidden;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+#page-main {
+    background: #090d16;
+    min-height: 100vh;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
 .page.active-page {
@@ -62,8 +71,6 @@ body {
 }
 #page-main.active-page {
     display: block;
-    overflow-y: auto;
-    overflow-x: hidden;
 }
 
 #page-intro.active-page,
@@ -331,7 +338,7 @@ body {
         .back-link:hover { color: var(--indigo); }
         #page-main {
     background: #090d16;
-    height: 100vh;
+    min-height: 100vh;
     display: none;
 }
         #page-main:target { display: block; }
@@ -1715,7 +1722,6 @@ window.addEventListener("DOMContentLoaded", () => {
 function setStatus(msg) {
     document.getElementById("scan-status-text").textContent = msg;
 }
-
 function showToast(msg) {
     const t = document.getElementById("toast");
     t.textContent = msg;
